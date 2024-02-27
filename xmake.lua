@@ -1,6 +1,6 @@
 add_rules("mode.debug", "mode.release")
 
-set_languages("cxx20")
+set_languages("c++20")
 
 target("SoftwareRasterization")
     add_includedirs("lib")
