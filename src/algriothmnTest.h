@@ -159,11 +159,13 @@ TGAImage simpleWorldTest() {
     std::array<vec3, 3> screen_coords;
     std::array<vec3, 3> world_coords;
     std::array<vec2, 2> diffuse_coords;
+    std::array<vec2, 3> uv_coords;
     for (int j = 0; j < 3; j++) {
       vec3 v0 = model.vert(i,j);
 
       screen_coords[j] = world2screenCoords(v0,{static_cast<double>(width),static_cast<double>(height)});
       world_coords[j] = v0;
+      uv_coords[j] = model.uv(i,j);
     }
 
     // 计算世界坐标系下的法向量
@@ -174,10 +176,9 @@ TGAImage simpleWorldTest() {
 
     float intensity = normal * light_dir;
     if (intensity > 0) // 正面
-      rasterize(screen_coords, zbuffer, image,
-                TGAColor({static_cast<uint8_t>(intensity * 255),
-        static_cast<uint8_t>(intensity * 255), static_cast<uint8_t>(intensity
-        * 255), 255}));
+      rasterize(screen_coords, zbuffer, uv_coords,
+                model.diffuse(),image);
   }
+
   return image;
 }

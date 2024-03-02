@@ -20,7 +20,7 @@ vec3 barycentric(std::array<vec3, 3> verts, vec3 P);
 void boundingboxTriange(std::array<vec2, 3> verts, TGAImage &image,
                         TGAColor color);
 
-void rasterize(std::array<vec3, 3> verts, std::vector<double> &zbuffer,
-               TGAImage &image, TGAColor color);
+void rasterize(std::array<vec3, 3> verts, std::vector<double> &zbuffer, std::array<vec2,3> uvs, const TGAImage &diffuse,
+               TGAImage &image);
 
 vec3 world2screenCoords(vec3 v,vec2 screen_size);

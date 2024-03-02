@@ -218,10 +218,11 @@ void boundingboxTriange(std::array<vec2, 3> verts, TGAImage &image,
   }
 }
 
-void rasterize(std::array<vec3, 3> verts, std::vector<double> &zbuffer,
-               TGAImage &image, TGAColor color) {
-  if (verts[0].y == verts[1].y && verts[1].y == verts[2].y)
-    return;
+// TODO: Fix Raster Z Buffer Bug
+void rasterize(std::array<vec3, 3> verts, std::vector<double> &zbuffer,std::array<vec2,3> uvs, const TGAImage &diffuse,
+               TGAImage &image) {
+//   if (verts[0].y == verts[1].y && verts[1].y == verts[2].y)
+//     return;
   vec2 bboxmin(static_cast<float>(image.width() - 1),
                static_cast<float>(image.height() - 1));
   vec2 bboxmax(0, 0);
@@ -251,24 +252,22 @@ void rasterize(std::array<vec3, 3> verts, std::vector<double> &zbuffer,
       vec3 p = barycentric(verts,
                            {static_cast<double>(i), static_cast<double>(j), 0});
 
-      if (i == 404 && j == 800 - 470) {
-        std::cout << std::format("Spec: ({},{})\n", i, j);
-      }
-
       if (p.x < 0 || p.y < 0 || p.z < 0)
         continue;
       double z = 0;
-      for (int k = 0; k < 3; k++) // 基于重心坐标比例对三个顶点的z插值
-        z += verts[k].z * p[k];
-
-      int zbuffer_index = image.width() * i + j;
+      vec2 uv {};
+      for (int k = 0; k < 3; k++) {
+        uv.x += uvs[k].x * p[k];
+        uv.y += uvs[k].y * p[k];
+        z += verts[k].z * p[k];  // 基于重心坐标比例对三个顶点的z插值
+      }  
+    
+      int zbuffer_index = image.width() *j + i;
 
       if (zbuffer[zbuffer_index] > z) {
+        auto color = diffuse.get(static_cast<int>(uv.x*diffuse.width()),static_cast<int>(uv.y*diffuse.height()));
         zbuffer[zbuffer_index] = z;
         image.set(i, j, color);
-      } else {
-        std::cout << std::format("Pixel :({},{}) Z-Bffer:{} Z:{}\n", i, j,
-                                 zbuffer[zbuffer_index], z);
       }
     }
   }
