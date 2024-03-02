@@ -8,9 +8,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
 
-    auto image = flatShadingTest();
-
-    image.flip_vertically();
+    auto image = simpleWorldTest();
     image.write_tga_file("output.tga");
     return 0;
 }
