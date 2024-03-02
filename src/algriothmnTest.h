@@ -151,7 +151,7 @@ TGAImage simpleWorldTest() {
 
   // init zbuffer
   for (auto &&item : zbuffer)
-    item = std::numeric_limits<float>::max();
+    item = -std::numeric_limits<float>::max();
 
   int width = image.width();
   int height = image.height();
@@ -174,10 +174,9 @@ TGAImage simpleWorldTest() {
     vec3 normal = cross(v1,v2);
     normal = normal.normalized();
 
-    float intensity = normal * light_dir;
-    if (intensity > 0) // 正面
-      rasterize(screen_coords, zbuffer, uv_coords,
-                model.diffuse(),image);
+    // float intensity = normal * light_dir;
+    // if (intensity >= 0) // 正面
+    rasterize(screen_coords, zbuffer, uv_coords,model.diffuse(),image);
   }
 
   return image;

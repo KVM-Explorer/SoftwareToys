@@ -260,11 +260,18 @@ void rasterize(std::array<vec3, 3> verts, std::vector<double> &zbuffer,std::arra
         uv.x += uvs[k].x * p[k];
         uv.y += uvs[k].y * p[k];
         z += verts[k].z * p[k];  // 基于重心坐标比例对三个顶点的z插值
-      }  
-    
-      int zbuffer_index = image.width() *j + i;
+      }
 
-      if (zbuffer[zbuffer_index] > z) {
+
+      if (i == 406 && j == 462) {
+        std::cout<< std::format("Spec: ({},{},{})\n",i,j,z);
+        }
+      int zbuffer_index = image.width() *i + j;
+
+      if (zbuffer[zbuffer_index] < z) {
+            if (i == 406 && j == 462) {
+        std::cout<< std::format("Draw: ({},{},{})\n",i,j,z);
+        }
         auto color = diffuse.get(static_cast<int>(uv.x*diffuse.width()),static_cast<int>(uv.y*diffuse.height()));
         zbuffer[zbuffer_index] = z;
         image.set(i, j, color);
