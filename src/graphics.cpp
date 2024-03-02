@@ -127,8 +127,8 @@ void flatShadingModel(Model &model, TGAImage &image)
 
             verts.push_back({x0,y0,});
         }
-        // boundingboxTriange({verts[0],verts[1],verts[2]}, image, color);
-        scanTriangle(verts[0], verts[1], verts[2], image, color);
+        boundingboxTriange({verts[0],verts[1],verts[2]}, image, color);
+        // scanTriangle(verts[0], verts[1], verts[2], image, color);
     }
     
 }
@@ -216,8 +216,8 @@ void boundingboxTriange(std::array<Vec2i,3> verts, TGAImage &image, TGAColor col
         bboxmin.x = std::max(0, bboxmin.x); 
         bboxmin.y = std::max(0, bboxmin.y);
 
-        bboxmax.x = std::min(clamp.x, verts[i].x);
-        bboxmax.y = std::min(clamp.y, verts[i].y);
+        bboxmax.x = std::min(clamp.x, bboxmax.x);
+        bboxmax.y = std::min(clamp.y, bboxmax.y);
     }
 
     for (int i = bboxmin.x; i <= bboxmax.x;i++)

@@ -39,9 +39,28 @@ TGAImage scanTriangleTest()
 
 TGAImage paralleRasterationTest()
 {
-    TGAImage image(200, 200, TGAImage::RGB); 
-    std::array<Vec2i,3> pts = {Vec2i(10,10), Vec2i(100, 30), Vec2i(190, 160)}; 
+    TGAImage image(400, 400, TGAImage::RGB); 
+    std::array<Vec2i,3> pts =   {Vec2i(10,10), Vec2i(100, 30), Vec2i(190, 160)};
+    std::array<Vec2i, 3> t1 =   {Vec2i{100,0}, Vec2i{100,100,}, Vec2i{200,0}};
+    std::array<Vec2i,3> t2 =    {Vec2i{100,0}, Vec2i{200,100,}, Vec2i{200,0}};
+    std::array<Vec2i,3> t3 =    {Vec2i{100,0}, Vec2i{100,100,}, Vec2i{200,100}};
+    std::array<Vec2i,3> t4 =    {Vec2i{100,100}, Vec2i{200,100,}, Vec2i{200,0}};
+
+
     boundingboxTriange(pts, image, RED);
+
+    boundingboxTriange(t1,image,RED);
+    for (auto &&i : t2)
+        i = i+ Vec2i(100,0);
+    boundingboxTriange(t2 ,image,WHITE);
+    for(auto &&i:t3)
+        i = i + Vec2i(0,100);
+    boundingboxTriange(t3 ,image,WHITE);
+    for(auto &&i:t4)
+        i = i + Vec2i(100,100);
+    boundingboxTriange(t4 ,image,WHITE);
+
+
     return image;
 }
 
