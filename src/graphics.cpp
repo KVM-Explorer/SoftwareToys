@@ -153,7 +153,6 @@ void scanTriangle(vec2 t0, vec2 t1, vec2 t2, TGAImage &image, TGAColor color) {
   }
 }
 
-// TODO: Fix BoundingBoxTriangle Bug
 vec3 barycentric(std::array<vec2, 3> verts, vec2 P) {
   // 向量叉乘判定点在内外侧
   auto v1 =
@@ -218,7 +217,6 @@ void boundingboxTriange(std::array<vec2, 3> verts, TGAImage &image,
   }
 }
 
-// TODO: Fix Raster Z Buffer Bug
 void rasterize(std::array<vec3, 3> verts, std::vector<double> &zbuffer,std::array<vec2,3> uvs, const TGAImage &diffuse,
                TGAImage &image) {
 //   if (verts[0].y == verts[1].y && verts[1].y == verts[2].y)
@@ -263,15 +261,9 @@ void rasterize(std::array<vec3, 3> verts, std::vector<double> &zbuffer,std::arra
       }
 
 
-      if (i == 406 && j == 462) {
-        std::cout<< std::format("Spec: ({},{},{})\n",i,j,z);
-        }
       int zbuffer_index = image.width() *i + j;
 
       if (zbuffer[zbuffer_index] < z) {
-            if (i == 406 && j == 462) {
-        std::cout<< std::format("Draw: ({},{},{})\n",i,j,z);
-        }
         auto color = diffuse.get(static_cast<int>(uv.x*diffuse.width()),static_cast<int>(uv.y*diffuse.height()));
         zbuffer[zbuffer_index] = z;
         image.set(i, j, color);

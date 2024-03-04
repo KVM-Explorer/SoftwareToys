@@ -1,4 +1,6 @@
 #include "graphics.h"
+#include "pipeline.h"
+#include "space.h"
 #include "tgaimage.h"
 #include <limits>
 
@@ -39,29 +41,29 @@ TGAImage paralleRasterationTest() {
   TGAImage image(400, 400, TGAImage::RGB);
   std::array<vec2, 3> pts = {vec2(10, 10), vec2(100, 30), vec2(190, 160)};
   std::array<vec2, 3> t1 = {vec2{100, 0},
-                             vec2{
-                                 100,
-                                 100,
-                             },
-                             vec2{200, 0}};
+                            vec2{
+                                100,
+                                100,
+                            },
+                            vec2{200, 0}};
   std::array<vec2, 3> t2 = {vec2{100, 0},
-                             vec2{
-                                 200,
-                                 100,
-                             },
-                             vec2{200, 0}};
+                            vec2{
+                                200,
+                                100,
+                            },
+                            vec2{200, 0}};
   std::array<vec2, 3> t3 = {vec2{100, 0},
-                             vec2{
-                                 100,
-                                 100,
-                             },
-                             vec2{200, 100}};
+                            vec2{
+                                100,
+                                100,
+                            },
+                            vec2{200, 100}};
   std::array<vec2, 3> t4 = {vec2{100, 100},
-                             vec2{
-                                 200,
-                                 100,
-                             },
-                             vec2{200, 0}};
+                            vec2{
+                                200,
+                                100,
+                            },
+                            vec2{200, 0}};
 
   boundingboxTriange(pts, image, RED);
 
@@ -85,10 +87,12 @@ TGAImage flatShadingTest() {
   int width = image.width();
   int height = image.height();
   for (int i = 0; i < model.nfaces(); i++) {
-    TGAColor color = TGAColor({static_cast<uint8_t>(rand() % 255), static_cast<uint8_t>(rand() % 255), static_cast<uint8_t>(rand() % 255), 255});
+    TGAColor color = TGAColor({static_cast<uint8_t>(rand() % 255),
+                               static_cast<uint8_t>(rand() % 255),
+                               static_cast<uint8_t>(rand() % 255), 255});
     std::vector<vec2> verts{};
     for (int j = 0; j < 3; j++) {
-      vec3 v0 = model.vert(i,j);
+      vec3 v0 = model.vert(i, j);
 
       int x0 = (v0.x + 1.0F) * width / 2.0F;
       int y0 = (v0.y + 1.0F) * height / 2.0F;
@@ -117,7 +121,7 @@ TGAImage simpleLightModelTest() {
     std::array<vec3, 3> world_coords;
 
     for (int j = 0; j < 3; j++) {
-      vec3 v0 = model.vert(i,j);
+      vec3 v0 = model.vert(i, j);
 
       screen_coords[j] = vec2(static_cast<int>((v0.x + 1.0F) * width / 2.0F),
                               static_cast<int>((v0.y + 1.0F) * height / 2.0F));
@@ -127,14 +131,16 @@ TGAImage simpleLightModelTest() {
     // 计算世界坐标系下的法向量
     vec3 v1 = vec3(world_coords[0] - world_coords[2]);
     vec3 v2 = vec3(world_coords[0] - world_coords[1]);
-    vec3 normal = cross(v1,v2);
+    vec3 normal = cross(v1, v2);
     normal = normal.normalized();
-    
+
     float intensity = normal * light_dir;
     if (intensity > 0) // 正面
       boundingboxTriange(
           screen_coords, image,
-          TGAColor({static_cast<uint8_t>(intensity * 255), static_cast<uint8_t>(intensity * 255), static_cast<uint8_t>(intensity * 255), 255}));
+          TGAColor({static_cast<uint8_t>(intensity * 255),
+                    static_cast<uint8_t>(intensity * 255),
+                    static_cast<uint8_t>(intensity * 255), 255}));
   }
   return image;
 }
@@ -161,23 +167,52 @@ TGAImage simpleWorldTest() {
     std::array<vec2, 2> diffuse_coords;
     std::array<vec2, 3> uv_coords;
     for (int j = 0; j < 3; j++) {
-      vec3 v0 = model.vert(i,j);
+      vec3 v0 = model.vert(i, j);
 
-      screen_coords[j] = world2screenCoords(v0,{static_cast<double>(width),static_cast<double>(height)});
+      screen_coords[j] = world2screenCoords(
+          v0, {static_cast<double>(width), static_cast<double>(height)});
       world_coords[j] = v0;
-      uv_coords[j] = model.uv(i,j);
+      uv_coords[j] = model.uv(i, j);
     }
 
     // 计算世界坐标系下的法向量
-	vec3 v1 = vec3(world_coords[0] - world_coords[2]);
+    vec3 v1 = vec3(world_coords[0] - world_coords[2]);
     vec3 v2 = vec3(world_coords[0] - world_coords[1]);
-    vec3 normal = cross(v1,v2);
+    vec3 normal = cross(v1, v2);
     normal = normal.normalized();
 
     // float intensity = normal * light_dir;
     // if (intensity >= 0) // 正面
-    rasterize(screen_coords, zbuffer, uv_coords,model.diffuse(),image);
+    rasterize(screen_coords, zbuffer, uv_coords, model.diffuse(), image);
   }
 
   return image;
+}
+
+TGAImage GouraudShaderTest() {
+  const vec3 eye{1, 1, 3};
+  const vec3 center{0, 0, 0};
+  const vec3 up(0, 1, 0);
+  const vec3 lightDir{1, 1, 1};
+  const int width = 800;
+  const int heigth = 800;
+
+  VSInput vsInput;
+  vsInput.viewport = lookAt(eye, center, up);
+  vsInput.viewport = viewport(800, 800);
+  vsInput.project = project(0, -1.0F / (eye - center).norm());
+
+  TGAImage image(width, heigth, TGAImage::RGB);
+  TGAImage zbuffer(width, heigth, TGAImage::GRAYSCALE);
+  Model model("obj/african_head/african_head.obj");
+  GouraudShader shader(vsInput);
+
+  for (int i = 0; i < model.nfaces(); i++) {
+    std::array<vec4, 3> screen_coords;
+    for (int j = 0; j < 3; j++) {
+      auto pt = model.vert(i, j);
+      screen_coords[j] = shader.vertex(pt);
+    }
+    pipeline(screen_coords,shader,image,zbuffer);
+  }
 }
