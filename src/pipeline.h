@@ -15,7 +15,7 @@ struct PSInput {
 
 class IShader {
 public:
-  virtual ~IShader();
+  virtual ~IShader(){};
   virtual vec4 vertex(vec3 pt) = 0;
   virtual bool fragment(vec3 bar, TGAColor &color) = 0;
 };
@@ -24,6 +24,8 @@ class GouraudShader : public IShader {
 public:
   PSInput psInput;
   VSInput vsInput;
+
+  virtual ~GouraudShader() {}
 
   explicit GouraudShader(VSInput input) : vsInput(input) {}
 
@@ -41,5 +43,5 @@ public:
   }
 };
 
-void pipeline(std::array<vec4, 3> pts, IShader &shader,
-                               TGAImage &image, TGAImage &zbuffer);
+void pipeline(std::array<vec4, 3> pts, IShader &shader, TGAImage &image,
+              TGAImage &zbuffer);

@@ -190,7 +190,7 @@ TGAImage simpleWorldTest() {
 }
 
 TGAImage GouraudShaderTest() {
-  const vec3 eye{1, 1, 3};
+  const vec3 eye{0, 0, 1};
   const vec3 center{0, 0, 0};
   const vec3 up(0, 1, 0);
   const vec3 lightDir{1, 1, 1};
@@ -198,21 +198,32 @@ TGAImage GouraudShaderTest() {
   const int heigth = 800;
 
   VSInput vsInput;
-  vsInput.viewport = lookAt(eye, center, up);
+  vsInput.viewmodel = lookAt(eye, center, up);
   vsInput.viewport = viewport(800, 800);
-  vsInput.project = project(0, -1.0F / (eye - center).norm());
+  vsInput.project = project(1,-2);
 
-  TGAImage image(width, heigth, TGAImage::RGB);
-  TGAImage zbuffer(width, heigth, TGAImage::GRAYSCALE);
+  TGAImage image(width, heigth, TGAImage::Format::RGB);
+  TGAImage zbuffer(width, heigth, TGAImage::Format::GRAYSCALE);
   Model model("obj/african_head/african_head.obj");
   GouraudShader shader(vsInput);
 
-  for (int i = 0; i < model.nfaces(); i++) {
-    std::array<vec4, 3> screen_coords;
-    for (int j = 0; j < 3; j++) {
-      auto pt = model.vert(i, j);
-      screen_coords[j] = shader.vertex(pt);
-    }
-    pipeline(screen_coords,shader,image,zbuffer);
+  // for (int i = 0; i < model.nfaces(); i++) {
+  //   std::array<vec4, 3> screen_coords;
+  //   for (int j = 0; j < 3; j++) {
+  //     auto pt = model.vert(i, j);
+  //     screen_coords[j] = shader.vertex(pt);
+  //   }
+  //   pipeline(screen_coords,shader,image,zbuffer);
+  // }
+  // Test Triangle
+  auto pts = std::array<vec3, 3>{vec3{-0.5, 0, -2}, vec3{0.0, 1.0, -2.0},
+                                 vec3{0.5, 0, -2.0}};
+
+  std::array<vec4, 3> screen_coords;
+  for (int j = 0; j < 3; j++) {
+      screen_coords[j] = shader.vertex(pts[j]);
   }
+  pipeline(screen_coords,shader,image,zbuffer);
+
+  return image;
 }
