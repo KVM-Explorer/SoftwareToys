@@ -2,6 +2,7 @@
 #include "pipeline.h"
 #include "space.h"
 #include "tgaimage.h"
+#include <execution>
 #include <limits>
 
 const TGAColor RED = TGAColor({255, 0, 0, 0});
@@ -190,40 +191,46 @@ TGAImage simpleWorldTest() {
 }
 
 TGAImage GouraudShaderTest() {
-  const vec3 eye{0, 0, 1};
+  const vec3 eye{1, 1, 3};
   const vec3 center{0, 0, 0};
   const vec3 up(0, 1, 0);
-  const vec3 lightDir{1, 1, 1};
+  vec3 lightDir{1, 1, 1};
   const int width = 800;
   const int heigth = 800;
+  const float near = 1;
+  const float far = -3;
 
   VSInput vsInput;
   vsInput.viewmodel = lookAt(eye, center, up);
-  vsInput.viewport = viewport(800, 800);
-  vsInput.project = project(1,-2);
+  vsInput.viewport = viewport(800, 800,near,far);
+  vsInput.project = project(near,far);
+  vsInput.lightDir = lightDir.normalized();
 
   TGAImage image(width, heigth, TGAImage::Format::RGB);
   TGAImage zbuffer(width, heigth, TGAImage::Format::GRAYSCALE);
   Model model("obj/african_head/african_head.obj");
   GouraudShader shader(vsInput);
 
-  // for (int i = 0; i < model.nfaces(); i++) {
-  //   std::array<vec4, 3> screen_coords;
-  //   for (int j = 0; j < 3; j++) {
-  //     auto pt = model.vert(i, j);
-  //     screen_coords[j] = shader.vertex(pt);
-  //   }
-  //   pipeline(screen_coords,shader,image,zbuffer);
-  // }
-  // Test Triangle
-  auto pts = std::array<vec3, 3>{vec3{-0.5, 0, -2}, vec3{0.0, 1.0, -2.0},
-                                 vec3{0.5, 0, -2.0}};
+  for (int i = 0; i < model.nfaces(); i++) {
+    std::array<vec4, 3> screen_coords;
+    for (int j = 0; j < 3; j++) {
+      auto pt = model.vert(i, j);
+      auto normal = model.normal(i, j);
+      screen_coords[j] = shader.vertex(pt, normal, j);
+    }
+    pipeline(screen_coords, shader, image, zbuffer);
 
-  std::array<vec4, 3> screen_coords;
-  for (int j = 0; j < 3; j++) {
-      screen_coords[j] = shader.vertex(pts[j]);
   }
-  pipeline(screen_coords,shader,image,zbuffer);
+  // Test Triangle
+  // auto pts = std::array<vec3, 3>{vec3{-0.5, 0, -2},
+  //                                vec3{0.0, 1.0, -1.0},
+  //                                vec3{0.5, 0, 0.0}};
+
+  // std::array<vec4, 3> screen_coords;
+  // for (int j = 0; j < 3; j++) {
+  //     screen_coords[j] = shader.vertex(pts[j]);
+  // }
+  // pipeline(screen_coords,shader,image,zbuffer);
 
   return image;
 }
