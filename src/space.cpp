@@ -27,8 +27,11 @@ Matrix viewport(int width, int height,int near,int far) {
   ret[1][1] = height / 2;
   ret[1][3] = height / 2;
 
-  ret[2][2] = -1 / (near - far);
-  ret[2][3] = near / (near-far);
+  // ret[2][2] = -1 / (near - far);
+  // ret[2][3] = near / (near-far);
+
+  ret[2][2] = -255 / 2; // 翻转为-z，使得0-255 本来越小越近，翻转成越大越近
+  ret[2][3] = 255 / 2;
 
   // ignore depth Process
   return ret;

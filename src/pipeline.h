@@ -38,11 +38,11 @@ public:
     return vsInput.viewport * ret;
   }
   bool fragment(vec3 bar, TGAColor &color) override {
-    auto intensity = bar * psInput.intensity;
-    // color = TGAColor({static_cast<uint8_t>(255 * intensity),
-    //                   static_cast<uint8_t>(intensity * 255),
-    //                   static_cast<uint8_t>(intensity * 255)});
-    color = TGAColor({255, 255, 255, 0});
+    float intensity = bar * psInput.intensity;
+    color = TGAColor({static_cast<uint8_t>(255 * intensity),
+                      static_cast<uint8_t>(intensity * 255),
+                      static_cast<uint8_t>(intensity * 255)});
+    // color = TGAColor({255, 255, 255, 0});
     return false;
   }
 };

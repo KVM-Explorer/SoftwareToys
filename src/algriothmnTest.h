@@ -202,8 +202,8 @@ TGAImage GouraudShaderTest() {
 
   VSInput vsInput;
   vsInput.viewmodel = lookAt(eye, center, up);
-  vsInput.viewport = viewport(800, 800,near,far);
-  vsInput.project = project(near,far);
+  vsInput.viewport = viewport(800, 800, near, far);
+  vsInput.project = project(near, far);
   vsInput.lightDir = lightDir.normalized();
 
   TGAImage image(width, heigth, TGAImage::Format::RGB);
@@ -219,7 +219,6 @@ TGAImage GouraudShaderTest() {
       screen_coords[j] = shader.vertex(pt, normal, j);
     }
     pipeline(screen_coords, shader, image, zbuffer);
-
   }
   // Test Triangle
   // auto pts = std::array<vec3, 3>{vec3{-0.5, 0, -2},
@@ -231,6 +230,7 @@ TGAImage GouraudShaderTest() {
   //     screen_coords[j] = shader.vertex(pts[j]);
   // }
   // pipeline(screen_coords,shader,image,zbuffer);
-
+  zbuffer.write_tga_file("zbuffer.tga");
+  zbuffer.flip_vertically();
   return image;
 }
