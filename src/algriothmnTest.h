@@ -169,7 +169,6 @@ TGAImage simpleWorldTest() {
     std::array<vec2, 3> uv_coords;
     for (int j = 0; j < 3; j++) {
       vec3 v0 = model.vert(i, j);
-
       screen_coords[j] = world2screenCoords(
           v0, {static_cast<double>(width), static_cast<double>(height)});
       world_coords[j] = v0;
@@ -209,14 +208,15 @@ TGAImage GouraudShaderTest() {
   TGAImage image(width, heigth, TGAImage::Format::RGB);
   TGAImage zbuffer(width, heigth, TGAImage::Format::GRAYSCALE);
   Model model("obj/african_head/african_head.obj");
-  GouraudShader shader(vsInput);
+  GouraudShader shader(vsInput,model.diffuse());
 
   for (int i = 0; i < model.nfaces(); i++) {
     std::array<vec4, 3> screen_coords;
     for (int j = 0; j < 3; j++) {
       auto pt = model.vert(i, j);
       auto normal = model.normal(i, j);
-      screen_coords[j] = shader.vertex(pt, normal, j);
+      auto uv = model.uv(i,j);
+      screen_coords[j] = shader.vertex(pt, normal, uv,j);
     }
     pipeline(screen_coords, shader, image, zbuffer);
   }
