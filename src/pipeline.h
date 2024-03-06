@@ -31,7 +31,8 @@ public:
 
   virtual ~GouraudShader() {}
 
-  explicit GouraudShader(VSInput input,const TGAImage &diffuse) : vsInput(input) {
+  explicit GouraudShader(VSInput input, const TGAImage &diffuse)
+      : vsInput(input) {
     psInput.diffuse = diffuse;
   }
 
@@ -41,8 +42,12 @@ public:
     psInput.uv.set_col(idx, uv);
     auto ret = vsInput.project * vsInput.viewmodel * v;
     ret = ret / ret[3]; // 齐次归一化到NDC
-    // if (ret[2] > 0 || ret[2] < -1) {
-    //   std::cout << std::format("NDC: {} {} {}\n", ret[0], ret[1], ret[2]);
+                        // if (ret[2] > 0 || ret[2] < -1) {
+    static float minV = std::numeric_limits<float>::max();
+    static float maxV = -std::numeric_limits<float>::max();
+    minV = std::min(minV, static_cast<float>(ret[2]));
+    maxV = std::max(maxV, static_cast<float>(ret[2]));
+    std::cout<< std::format("MinV: {} MaxV: {}\n",minV,maxV);
     // }
     return vsInput.viewport * ret;
   }
@@ -51,9 +56,9 @@ public:
     vec2 uv = psInput.uv * bar;
     uv.x = uv.x * psInput.diffuse.width();
     uv.y = uv.y * psInput.diffuse.height();
-    color = psInput.diffuse.get(uv.x , uv.y);
-    for (int k = 0; k < 4; k++)
-      color[k] = color.bgra[k] * intensity;
+    color = psInput.diffuse.get(uv.x, uv.y);
+    // for (int k = 0; k < 4; k++)
+    //   color[k] = color.bgra[k] * intensity;
     // color =
     //     TGAColor({static_cast<uint8_t>(255 * intensity),
     //               static_cast<uint8_t>(intensity * 255),
