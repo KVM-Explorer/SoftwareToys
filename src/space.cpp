@@ -43,7 +43,7 @@ Matrix project(float near, float far) {
 
   ret[0][0] = ret[1][1] = near;
   ret[2][2] = (near + far) / (near - far);
-  ret[2][3] = -(2 * near * far) / (near - far);
+  ret[2][3] = -( near * far) / (near - far);
   ret[3][2] = 1;
   return ret;
 }

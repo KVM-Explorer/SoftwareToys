@@ -1,6 +1,7 @@
 #include "geometry.h"
 #include "tgaimage.h"
 #include <array>
+#include <format>
 using Matrix = mat<4, 4>;
 
 struct VSInput {
@@ -40,6 +41,9 @@ public:
     psInput.uv.set_col(idx, uv);
     auto ret = vsInput.project * vsInput.viewmodel * v;
     ret = ret / ret[3]; // 齐次归一化到NDC
+    // if (ret[2] > 0 || ret[2] < -1) {
+    //   std::cout << std::format("NDC: {} {} {}\n", ret[0], ret[1], ret[2]);
+    // }
     return vsInput.viewport * ret;
   }
   bool fragment(vec3 bar, TGAColor &color) override {
