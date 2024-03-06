@@ -8,6 +8,7 @@ struct VSInput {
   Matrix viewport;
   Matrix project;
   Matrix viewmodel;
+  Matrix projectNDC;
   vec3 lightDir;
 };
 
@@ -42,14 +43,22 @@ public:
     psInput.uv.set_col(idx, uv);
     auto ret = vsInput.project * vsInput.viewmodel * v;
     ret = ret / ret[3]; // 齐次归一化到NDC
-                        // if (ret[2] > 0 || ret[2] < -1) {
+    auto retNDC = vsInput.projectNDC * vsInput.viewmodel * v;
+    retNDC = retNDC / retNDC[3];
+    // if (ret[2] > 0 || ret[2] < -1) {
     static float minV = std::numeric_limits<float>::max();
     static float maxV = -std::numeric_limits<float>::max();
+    static float minNDC = std::numeric_limits<float>::max();
+    static float maxNDC = -std::numeric_limits<float>::max();
     minV = std::min(minV, static_cast<float>(ret[2]));
     maxV = std::max(maxV, static_cast<float>(ret[2]));
-    std::cout<< std::format("MinV: {} MaxV: {}\n",minV,maxV);
+    minNDC = std::min(minV, static_cast<float>(retNDC[2]));
+    maxNDC = std::max(maxV, static_cast<float>(retNDC[2]));
+    std::cout << std::format("MinV: {} MaxV: {} minNDC: {} maxNDC: {}\n", minV,
+                             maxV, minNDC, maxNDC);
+    // minNDC 存在异常，下界有问题：MinV: 0.4274048 MaxV: 0.5459242 minNDC: -1.0682955 maxNDC: 0.5459242
     // }
-    return vsInput.viewport * ret;
+    return vsInput.viewport * retNDC;
   }
   bool fragment(vec3 bar, TGAColor &color) override {
     float intensity = bar * psInput.intensity;

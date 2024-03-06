@@ -10,3 +10,4 @@ Matrix viewport(int x,int y,int width, int height);
 
 // near far 应该是有符号负数
 Matrix project(float near, float far);
+Matrix projectNDC(float near, float far) ;

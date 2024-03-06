@@ -190,7 +190,7 @@ TGAImage simpleWorldTest() {
 }
 
 TGAImage GouraudShaderTest() {
-  const vec3 eye{0, 1, 2};
+  const vec3 eye{0, 0, 3};
   const vec3 center{0, 0, 0};
   const vec3 up(0, 1, 0);
   vec3 lightDir{1, 1, 1};
@@ -202,8 +202,9 @@ TGAImage GouraudShaderTest() {
   VSInput vsInput;
   vsInput.viewmodel = lookAt(eye, center, up);
   vsInput.viewport = viewport(width / 8, heigth / 8, width*3/4, heigth*3/4);
-  
-  vsInput.project = project(near,far);
+
+  vsInput.project = project(near, far);
+  vsInput.projectNDC=projectNDC(near,far);
   vsInput.lightDir = lightDir.normalized();
 
   TGAImage image(width, heigth, TGAImage::Format::RGB);

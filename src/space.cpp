@@ -32,8 +32,8 @@ Matrix viewport(int x, int y, int width, int height) {
   // ret[2][2] = -1 / (near - far);
   // ret[2][3] = near / (near-far);
 
-  ret[2][2] = -1; // 翻转为-z，使得0-255 本来越小越近，翻转成越大越近
-  ret[2][3] = 1;
+  ret[2][2] = -1/2; // 翻转为-z，使得0-255 本来越小越近，翻转成越大越近
+  ret[2][3] = 1/2; 
 
   // ignore depth Process
   return ret;
@@ -45,6 +45,20 @@ Matrix project(float near, float far) {
   ret[0][0] = ret[1][1] = -near; // n/z * x 若保持x符号不变需要加个负号
   ret[2][2] = -far/(near-far) ;
   ret[2][3] = -(near * far) / (near - far);
+
+  ret[3][2] = 1;
+  ret[3][3] = 0;
+
+  return ret;
+}
+
+
+Matrix projectNDC(float near, float far) {
+  Matrix ret = Matrix::identity();
+
+  ret[0][0] = ret[1][1] = -near; // n/z * x 若保持x符号不变需要加个负号
+  ret[2][2] = (far+near)/(near-far) ; // 注意Z的变换顺序，是先投影，再平移，再放缩；不能先放缩再平移，大坑！！
+  ret[2][3] = -(2*near * far) / (near - far);
 
   ret[3][2] = 1;
   ret[3][3] = 0;
