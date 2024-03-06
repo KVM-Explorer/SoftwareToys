@@ -19,13 +19,14 @@ Matrix lookAt(vec3 eye, vec3 center, vec3 up) {
   return invR * transform; //  因为 corrds : origin ->R-> view  | inR * worldObject = viewObject 
 }
 
-Matrix viewport(int width, int height,int near,int far) {
+Matrix viewport(int x,int y,int width, int height) {
   Matrix ret = Matrix::identity();
   ret[0][0] = width / 2; // x/2 * width
-  ret[0][3] = width / 2; // x + 1/2 * width
+                         
+  ret[0][3] = x + width / 2; // x + 1/2 * width
 
   ret[1][1] = height / 2;
-  ret[1][3] = height / 2;
+  ret[1][3] = y + height / 2; 
 
   // ret[2][2] = -1 / (near - far);
   // ret[2][3] = near / (near-far);
@@ -41,7 +42,7 @@ Matrix project(float near, float far) {
   Matrix ret = Matrix::identity();
   ret[3][3] = 0;
 
-  ret[0][0] = ret[1][1] = near;
+  ret[0][0] = ret[1][1] = -near; // n/z * x 若保持x符号不变需要加个负号
   ret[2][2] = (near + far) / (near - far);
   ret[2][3] = -( near * far) / (near - far);
   ret[3][2] = 1;

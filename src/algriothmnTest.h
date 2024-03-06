@@ -201,7 +201,7 @@ TGAImage GouraudShaderTest() {
 
   VSInput vsInput;
   vsInput.viewmodel = lookAt(eye, center, up);
-  vsInput.viewport = viewport(800, 800, near, far);
+  vsInput.viewport = viewport(width / 8, heigth / 8, width*3/4, heigth*3/4);
   vsInput.project = project(near, far);
   vsInput.lightDir = lightDir.normalized();
 
