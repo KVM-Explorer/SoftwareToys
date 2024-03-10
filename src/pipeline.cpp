@@ -47,3 +47,39 @@ void pipeline(std::array<vec4, 3> verts, IShader &shader, TGAImage &image,
     }
   }
 }
+
+
+PhongShading::PhongShading(TGAImage &diffuse, VSInput input)  {
+  {
+    psInput.diffuse = diffuse;
+    psInput.lightDir = input.lightDir;
+    uniformM = input.project * input.viewmodel;
+    viewport = input.viewport;
+  }
+}
+
+vec4 PhongShading::vertex(vec3 pt, std::optional<bool> normal, std::optional<vec2> uv,
+            int idx) {
+  auto vert = embed<4>(pt);
+  if (normal.has_value())
+    psInput.uv.set_col(idx, uv.value());
+  vec4 ret = uniformM * vert;
+  return viewport * ret;
+}
+
+bool PhongShading::fragment(vec3 bar, TGAColor &color)  {
+  
+}
+
+
+// Shadow Shader
+
+ShadowShader::ShadowShader() {}
+vec4 ShadowShader::vertex(vec3 pt, std::optional<vec3> normal,
+                          std::optional<vec2> uv, int idx) {
+                            
+}
+bool ShadowShader::fragment(vec3 bar, TGAColor &color) {
+  
+}
+
